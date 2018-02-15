@@ -1,15 +1,27 @@
 const noiseScale = 0.006; // a lower value will result in less convolutions
 const highQuality = true; // true: render lines using an ellipse, false: render lines drawing indivudual pixels
 
+const colorRanges = [
+  [0, 45],
+  [90, 225],
+  [180, 360],
+  [315, 45],
+]
+
 let flowField = [];
 let angleMod = 0;
 let fpsCounter;
+let currentColorSet = [];
 
 function setup() {
+  
+  colorMode(HSB);
   createCanvas(windowWidth, windowHeight);
   background(0);
 
-  const maxLines = highQuality ? 4000 : 8000; // rendering ellipses is using more ressources, so we lower the paricles
+  currentColorRange = random(colorRanges);
+
+  const maxLines = highQuality ? 6000 : 10000; // rendering ellipses is using more ressources, so we lower the paricles
 
   for(let i = 0; i < maxLines; i++) {
     flowField.push(new FlowLine(random(0, width),random(0, height)));
@@ -20,7 +32,7 @@ function setup() {
 
 function draw() {
   fpsCounter.innerHTML = round(frameRate());
-
+  
   for(let i = 0; i < flowField.length; i++) {
     const line = flowField[i];
 
@@ -32,13 +44,11 @@ function draw() {
       line.draw();
     }
   }
-
 }
 
 function FlowLine(x, y) {
-
-  this.alpha = 5;
-  this.isBlack = random([true, false, false, false]); // 1 in 4 lines should be black to prevent full colored areas
+  
+  this.alpha = 0.008;
 
   this.initialize = function() {
     this.point = createVector(x, y);
@@ -58,28 +68,22 @@ function FlowLine(x, y) {
       point(this.point.x, this.point.y);
     }
 
-    this.point.add(this.direction);
-    this.updateNoise();
     this.updateDirection();
+    this.updateNoise();
   }
 
   this.setColor = function() {
-    if(this.isBlack) {
-      this.color = color(0, this.alpha);
-    } else {
-      // todo: set a basic color and move it slowly over time for every new flowline
-      // the curernt implementation results in a more red-/yellowish lines
-      this.color = color(
-        map(this.noise, 0, 0.4, 0, 255),
-        map(this.noise, 0.3, 0.7, 0, 255),
-        map(this.noise, 0.5, 1, 0, 255), 
-        this.alpha
-      );
-    }
+    this.color = color(
+      map(this.noise, 0, 1, currentColorRange[0], currentColorRange[1]),
+      100,
+      100,
+      this.alpha
+    );
   }
 
   this.updateDirection = function() {
     this.direction = p5.Vector.fromAngle(radians(map(this.noise, 0, 1, 0, 360) + angleMod));
+    this.point.add(this.direction);
   }
 
   this.updateNoise = function() {
