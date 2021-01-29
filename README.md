@@ -7,5 +7,5 @@ The starting points are random and the direction of each pixel is shifted over t
 
 Made with [P5.js](https://p5js.org/).
 
-[Click here to show  in your browser.](http://htmlpreview.github.io/?https://github.com/achjaderleon/p5js-pixel-flowfield/blob/master/index.html)
+[Click here to show  in your browser.](https://codepen.io/achjaderleon/pen/rNWNjMg)
 
